@@ -23,7 +23,7 @@ jobs:
         run: |
           REVIEW_CONFIG_FILE=${{ env.REVIEW_CONFIG_FILE }} rake pdf
           mv ./*.pdf ../output.pdf
-        working-directory: how-to-git/.github/workflows/articles  # 適切なディレクトリに変更してください
+        working-directory: /.github/workflows/articles  # 適切なディレクトリに変更してください
 
       - uses: actions/upload-artifact@v2
         with:
