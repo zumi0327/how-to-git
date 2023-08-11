@@ -2,7 +2,7 @@ name: Diff pdf on Push
 
 on:
   push:
-    branches: [ "main" ]  # この部分を適切なブランチ名に変更してください
+    branches:[ "main" ] # 適切なブランチ名に変更してください
 
 env:
   REVIEW_CONFIG_FILE: 'config.yml'
@@ -23,10 +23,9 @@ jobs:
         run: |
           REVIEW_CONFIG_FILE=${{ env.REVIEW_CONFIG_FILE }} rake pdf
           mv ./*.pdf ../output.pdf
-        working-directory: articles
+        working-directory: how-to-git/.github/workflows/articles  # 適切なディレクトリに変更してください
 
       - uses: actions/upload-artifact@v2
         with:
           name: Output PDF
           path: output.pdf
-
