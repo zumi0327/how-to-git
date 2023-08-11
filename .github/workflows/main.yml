@@ -1,0 +1,54 @@
+name: Diff pdf
+
+on:
+  pull_request:
+    types: [ opened, synchronize, reopened, labeled ] # Note: labelを外した契機では動かない
+
+env:
+  REVIEW_CONFIG_FILE: 'config.yml'  # 代表的な設定ファイルを指定
+
+jobs:
+  diff-pdf:
+    if: |
+      contains(github.event.pull_request.labels.*.name, 'diff-pdf') ||
+      ((github.event.action == 'labeled') && (github.event.label.name == 'diff-pdf'))
+    runs-on: ubuntu-latest
+    container:
+      image: vvakame/review:5.3 # 原稿のRe:VIEWバージョンと一致するイメージを指定
+
+    steps:
+      - name: Checkout head
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 100
+
+      - name: Build head PDF
+        run: |
+          REVIEW_CONFIG_FILE=${{ env.REVIEW_CONFIG_FILE }} rake pdf
+          mv ./*.pdf ../head.pdf
+        working-directory: articles
+
+      - name: Checkout base
+        run: |
+          git config --system --add safe.directory /__w/REPO_NAME/REPO_NAME # REPO_NAMEにはリポジトリ名を記述
+          git checkout ${{ github.event.pull_request.base.sha }}
+
+      - name: Build base PDF
+        run: |
+          REVIEW_CONFIG_FILE=${{ env.REVIEW_CONFIG_FILE }} rake pdf
+          mv ./*.pdf ../base.pdf
+        working-directory: articles
+
+      - name: Diff PDFs
+        uses: nowsprinting/diff-pdf-action@v1
+        with:
+          file1: base.pdf
+          file2: head.pdf
+          options: --verbose --skip-identical --mark-differences --output-diff=diff.pdf --dpi=100
+          suppress-diff-error: true
+        # Note: `--skip-identical`は差分が無い場合でも、空白1ページのpdfが出力される
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: Output diff PDF
+          path: diff.pdf
