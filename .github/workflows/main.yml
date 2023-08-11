@@ -2,7 +2,7 @@ name: Diff pdf on Push
 
 on:
   push:
-    branches:[ "main" ] # 適切なブランチ名に変更してください
+    branches: [ "main" ] # 適切なブランチ名に変更してください
 
 env:
   REVIEW_CONFIG_FILE: 'config.yml'
