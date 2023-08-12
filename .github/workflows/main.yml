@@ -5,6 +5,28 @@ jobs:
   diff-pdf:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout head
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 100
+
+      - name: Build head PDF
+        run: |
+          REVIEW_CONFIG_FILE=${{ env.REVIEW_CONFIG_FILE }} rake pdf
+          mv ./*.pdf ../head.pdf
+        working-directory: articles
+
+      - name: Checkout base
+        run: |
+          git config --system --add safe.directory /__w/REPO_NAME/REPO_NAME # REPO_NAMEにはリポジトリ名を記述
+          git checkout ${{ github.event.pull_request.base.sha }}
+
+      - name: Build base PDF
+        run: |
+          REVIEW_CONFIG_FILE=${{ env.REVIEW_CONFIG_FILE }} rake pdf
+          mv ./*.pdf ../base.pdf
+        working-directory: articles
+
       - uses: nowsprinting/diff-pdf-action@v1
         with:
           file1: base.pdf
