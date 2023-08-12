@@ -14,7 +14,7 @@ jobs:
         run: |
           REVIEW_CONFIG_FILE=${{ env.REVIEW_CONFIG_FILE }} rake pdf
           mv ./*.pdf ../head.pdf
-        working-directory: articles
+        working-directory: workflows
 
       - name: Checkout base
         run: |
@@ -25,7 +25,7 @@ jobs:
         run: |
           REVIEW_CONFIG_FILE=${{ env.REVIEW_CONFIG_FILE }} rake pdf
           mv ./*.pdf ../base.pdf
-        working-directory: articles
+        working-directory: workflows
 
       - uses: nowsprinting/diff-pdf-action@v1
         with:
